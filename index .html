@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CodeQuiz, a programming quiz app built by Samiuallah with HTML, CSS and JavaScript.">
+<title>CodeQuiz | Programming Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b4b; --muted:#6b6896; --violet:#6d28d9; --violet-dark:#5b21b6; --pink:#ec4899; --amber:#fbbf24;
+  --card:#ffffff; --soft:#f5f3ff; --line:#ddd6fe; --good:#15803d; --good-bg:#dcfce7; --bad:#b91c1c; --bad-bg:#fee2e2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Nunito,system-ui,Arial,sans-serif;color:var(--ink);line-height:1.6;min-height:100vh;display:flex;flex-direction:column;
+  background-color:#1e1b4b;
+  background-image:
+    radial-gradient(rgba(255,255,255,.13) 1.5px,transparent 1.5px),
+    radial-gradient(700px 420px at 90% -5%,rgba(236,72,153,.45),transparent 70%),
+    radial-gradient(800px 500px at 0% 105%,rgba(124,58,237,.6),transparent 70%),
+    linear-gradient(135deg,#1e1b4b 0%,#3b1a7a 60%,#5b21b6 100%);
+  background-size:24px 24px,auto,auto,auto;
+  background-attachment:fixed;
+}
+h1,h2,.logo,.score{font-family:Outfit,Nunito,Arial,sans-serif}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:12px}
+.container{width:min(720px,92%);margin:auto}
+
+header .bar{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.logo span{color:var(--amber)}
+.back{color:#d9d2ff;text-decoration:none;font-weight:700;padding:8px 16px;border:1.5px solid rgba(255,255,255,.28);border-radius:999px;transition:background .2s}
+.back:hover{background:rgba(255,255,255,.14);color:#fff}
+
+main{flex:1;padding:18px 0 56px}
+.card{background:var(--card);border-radius:28px;padding:clamp(24px,4.5vw,42px);box-shadow:0 30px 70px rgba(10,5,40,.5);position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:7px;background:linear-gradient(90deg,var(--violet),var(--pink),var(--amber))}
+
+h1{font-size:clamp(30px,5.5vw,42px);font-weight:800;text-align:center;margin-bottom:6px;letter-spacing:-.02em}
+.sub{color:var(--muted);text-align:center;margin-bottom:28px;font-weight:600}
+
+.topics{display:grid;gap:14px}
+.topic{display:flex;align-items:center;gap:16px;text-align:left;padding:18px 20px;background:var(--soft);border:2px solid var(--line);border-radius:18px;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.topic:hover{transform:translateY(-3px);border-color:var(--violet);box-shadow:0 12px 26px rgba(109,40,217,.18)}
+.icon{flex:none;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,var(--violet),var(--pink))}
+.topic .info{flex:1}
+.topic b{display:block;font-family:Outfit,Nunito,sans-serif;font-size:19px}
+.topic small{color:var(--muted);font-weight:600}
+.best{font-size:14px;font-weight:800;color:var(--violet-dark);background:#ede9fe;padding:4px 12px;border-radius:999px;white-space:nowrap}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;font-weight:700;color:var(--muted);font-size:15px}
+.timer{font-weight:800;color:var(--violet);background:#ede9fe;padding:4px 14px;border-radius:999px;min-width:68px;text-align:center}
+.timer.low{color:#fff;background:var(--bad)}
+.progress{height:10px;background:#ede9fe;border-radius:10px;overflow:hidden;margin-bottom:26px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--pink));border-radius:10px;transition:width .35s}
+.question{font-size:clamp(21px,3.6vw,27px);font-weight:700;line-height:1.3;margin-bottom:22px}
+
+.options{display:grid;gap:12px}
+.option{display:flex;align-items:center;gap:14px;text-align:left;padding:13px 16px;background:#fff;border:2px solid var(--line);border-radius:16px;cursor:pointer;font-weight:700;transition:transform .15s,border-color .2s,background .2s}
+.option:hover:not(:disabled){border-color:var(--violet);background:var(--soft);transform:translateX(4px)}
+.option:disabled{cursor:default}
+.letter{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#ede9fe;color:var(--violet-dark);font-family:Outfit,sans-serif;font-weight:800}
+.option.correct{border-color:var(--good);background:var(--good-bg)}
+.option.correct .letter{background:var(--good);color:#fff}
+.option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.option.wrong .letter{background:var(--bad);color:#fff}
+
+.feedback{min-height:1.7em;margin-top:18px;font-weight:800}
+.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.btn{padding:13px 28px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--violet),#a21caf);color:#fff;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(109,40,217,.3);transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(109,40,217,.4)}
+.btn.outline{background:#fff;color:var(--violet-dark);border:2px solid var(--line);box-shadow:none}
+.btn.outline:hover{border-color:var(--violet);box-shadow:none}
+
+.trophy{text-align:center;font-size:56px;line-height:1;margin-bottom:6px}
+.score{text-align:center;margin:6px 0 4px;font-size:clamp(50px,11vw,76px);font-weight:800;background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.center{text-align:center;color:var(--muted);font-weight:700;margin-bottom:4px}
+.review{margin-top:28px;display:grid;gap:10px}
+.review h2{font-size:21px}
+.item{padding:12px 16px;background:var(--soft);border-left:5px solid var(--good);border-radius:12px}
+.item.miss{border-left-color:var(--bad)}
+.item p{font-weight:800}
+.item small{display:block;color:var(--muted);font-weight:600}
+
+footer{text-align:center;padding:22px 0;color:#c9c0f5;font-size:15px;font-weight:600}
+@media (max-width:520px){.topic{flex-wrap:wrap}.best{margin-left:70px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container bar">
+    <span class="logo">Code<span>Quiz</span></span>
+    <a class="back" href="https://samiuallahganaie.github.io/CodeNest/">Back to portfolio</a>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="card" id="app" aria-live="polite"></div>
+  </div>
+</main>
+
+<footer>CodeQuiz | A project by Samiuallah | Built with HTML, CSS &amp; JavaScript</footer>
+
+<script>
+  const QUIZZES = [
+    { id: "python", icon: "\uD83D\uDC0D", name: "Python Basics", desc: "Syntax, data types and lists", questions: [
+      ["Which keyword is used to define a function in Python?", ["def", "function", "func", "define"], 0],
+      ["What does len([1, 2, 3]) return?", ["2", "3", "4", "An error"], 1],
+      ["Which of these data types is immutable?", ["List", "Dictionary", "Tuple", "Set"], 2],
+      ["What does print(type(5.0)) show?", ["<class 'int'>", "<class 'float'>", "<class 'str'>", "<class 'number'>"], 1],
+      ["Which symbol starts a single-line comment in Python?", ["//", "#", "--", "/*"], 1],
+      ["How do you get the last item of a list called nums?", ["nums[last]", "nums[0]", "nums[-1]", "nums.end()"], 2],
+      ["Which of these is a dictionary?", ["[1, 2, 3]", "(1, 2, 3)", "{\"a\": 1}", "{1, 2, 3}"], 2],
+      ["What does list(range(3)) produce?", ["[1, 2, 3]", "[0, 1, 2]", "[0, 1, 2, 3]", "[3]"], 1]
+    ]},
+    { id: "web", icon: "\uD83C\uDF10", name: "HTML, CSS & JavaScript", desc: "Web development fundamentals", questions: [
+      ["Which HTML tag creates the largest heading?", ["<h6>", "<head>", "<h1>", "<heading>"], 2],
+      ["Which CSS property changes the text colour?", ["font-color", "color", "text-color", "foreground"], 1],
+      ["Which JavaScript keyword declares a constant?", ["let", "var", "const", "static"], 2],
+      ["What does === check in JavaScript?", ["Value only", "Type only", "Value and type", "Memory address"], 2],
+      ["Which CSS layout system is two-dimensional (rows and columns)?", ["Flexbox", "Grid", "Float", "Inline"], 1],
+      ["Which attribute gives an image alternative text?", ["title", "src", "alt", "name"], 2],
+      ["What does document.getElementById(\"box\") return?", ["All elements with class box", "The element with id box", "The page title", "A new element"], 1],
+      ["Which tag links an external CSS file?", ["<style>", "<script>", "<link>", "<css>"], 2]
+    ]},
+    { id: "sql", icon: "\uD83D\uDDC4\uFE0F", name: "SQL & Git", desc: "Databases and version control", questions: [
+      ["Which SQL statement reads data from a table?", ["GET", "SELECT", "READ", "FETCH"], 1],
+      ["Which SQL clause filters rows?", ["WHERE", "ORDER BY", "GROUP", "LIMIT"], 0],
+      ["Which SQL statement removes rows from a table?", ["REMOVE", "DROP ROW", "DELETE", "CLEAR"], 2],
+      ["Which Git command saves staged changes to the local history?", ["git push", "git commit", "git pull", "git save"], 1],
+      ["Which Git command copies a repository to your computer?", ["git clone", "git fork", "git copy", "git init"], 0],
+      ["Which SQL clause sorts the results?", ["SORT", "GROUP BY", "ORDER BY", "ARRANGE"], 2],
+      ["What does a PRIMARY KEY do?", ["Encrypts the table", "Uniquely identifies each row", "Sorts the rows", "Deletes duplicates"], 1],
+      ["What does git add . do?", ["Uploads to GitHub", "Stages all changes", "Deletes changes", "Creates a branch"], 1]
+    ]}
+  ];
+
+  const SECONDS = 20;
+  const LETTERS = ["A", "B", "C", "D"];
+  const app = document.getElementById("app");
+  let quiz, list, index, score, answers, timerId, timeLeft;
+
+  function el(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function getBest(id) {
+    try { return localStorage.getItem("codequiz-best-" + id); } catch (e) { return null; }
+  }
+  function setBest(id, value) {
+    try { localStorage.setItem("codequiz-best-" + id, String(value)); } catch (e) {}
+  }
+
+  function showTopics() {
+    clearInterval(timerId);
+    app.replaceChildren();
+    app.append(el("h1", "", "Test your skills"), el("p", "sub", "Pick a topic. 8 questions, 20 seconds each."));
+    const wrap = el("div", "topics");
+    QUIZZES.forEach(q => {
+      const btn = el("button", "topic");
+      btn.type = "button";
+      const info = el("div", "info");
+      info.append(el("b", "", q.name), el("small", "", q.desc));
+      btn.append(el("span", "icon", q.icon), info);
+      const best = getBest(q.id);
+      if (best !== null) btn.append(el("span", "best", "Best " + best + "/" + q.questions.length));
+      btn.addEventListener("click", () => start(q));
+      wrap.append(btn);
+    });
+    app.append(wrap);
+  }
+
+  function start(q) {
+    quiz = q;
+    list = shuffle(q.questions).map(([text, opts, correct]) => {
+      const options = shuffle(opts.map((label, i) => ({ label, right: i === correct })));
+      return { text, options };
+    });
+    index = 0; score = 0; answers = [];
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = list[index];
+    app.replaceChildren();
+
+    const top = el("div", "top");
+    top.append(el("span", "", "Question " + (index + 1) + " of " + list.length));
+    const timer = el("span", "timer", SECONDS + "s");
+    top.append(timer);
+    const progress = el("div", "progress");
+    const bar = document.createElement("i");
+    bar.style.width = (index / list.length * 100) + "%";
+    progress.append(bar);
+
+    const heading = el("h2", "question", q.text);
+    const options = el("div", "options");
+    const feedback = el("p", "feedback");
+    const actions = el("div", "actions");
+    let answered = false;
+
+    function finishQuestion(chosen) {
+      if (answered) return;
+      answered = true;
+      clearInterval(timerId);
+      const correct = chosen !== null && q.options[chosen].right;
+      if (correct) score++;
+      const rightLabel = q.options.find(o => o.right).label;
+      answers.push({ text: q.text, picked: chosen === null ? null : q.options[chosen].label, right: rightLabel, correct });
+      Array.from(options.children).forEach((btn, i) => {
+        btn.disabled = true;
+        if (q.options[i].right) btn.classList.add("correct");
+        else if (i === chosen) btn.classList.add("wrong");
+      });
+      feedback.className = "feedback " + (correct ? "good" : "bad");
+      feedback.textContent = correct ? "Correct! Well done." :
+        (chosen === null ? "Time is up. " : "Not quite. ") + "The answer is: " + rightLabel;
+      const next = el("button", "btn", index + 1 === list.length ? "See results" : "Next question");
+      next.type = "button";
+      next.addEventListener("click", () => { index++; index < list.length ? showQuestion() : showResults(); });
+      actions.append(next);
+      next.focus();
+    }
+
+    q.options.forEach((opt, i) => {
+      const btn = el("button", "option");
+      btn.type = "button";
+      btn.append(el("span", "letter", LETTERS[i]), el("span", "", opt.label));
+      btn.addEventListener("click", () => finishQuestion(i));
+      options.append(btn);
+    });
+
+    app.append(top, progress, heading, options, feedback, actions);
+
+    timeLeft = SECONDS;
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+      timeLeft--;
+      timer.textContent = timeLeft + "s";
+      timer.classList.toggle("low", timeLeft <= 5);
+      if (timeLeft <= 0) finishQuestion(null);
+    }, 1000);
+  }
+
+  function showResults() {
+    clearInterval(timerId);
+    const total = list.length;
+    const prev = getBest(quiz.id);
+    if (prev === null || score > Number(prev)) setBest(quiz.id, score);
+
+    const pct = Math.round(score / total * 100);
+    const trophy = pct === 100 ? "\uD83C\uDFC6" : pct >= 75 ? "\uD83C\uDF89" : pct >= 50 ? "\uD83D\uDC4D" : "\uD83D\uDCAA";
+    const message = pct === 100 ? "Perfect score!" : pct >= 75 ? "Great job!" : pct >= 50 ? "Good effort. Keep practising." : "Keep learning, you'll get there.";
+
+    app.replaceChildren();
+    app.append(el("div", "trophy", trophy), el("h1", "", "Quiz complete"), el("p", "center", quiz.name),
+      el("div", "score", score + " / " + total), el("p", "center", pct + "% | " + message));
+
+    const actions = el("div", "actions");
+    actions.style.justifyContent = "center";
+    const again = el("button", "btn", "Try again");
+    again.type = "button";
+    again.addEventListener("click", () => start(quiz));
+    const topics = el("button", "btn outline", "Choose another topic");
+    topics.type = "button";
+    topics.addEventListener("click", showTopics);
+    actions.append(again, topics);
+    app.append(actions);
+
+    const review = el("div", "review");
+    review.append(el("h2", "", "Review your answers"));
+    answers.forEach(a => {
+      const item = el("div", "item" + (a.correct ? "" : " miss"));
+      item.append(el("p", "", a.text),
+        el("small", "", "Your answer: " + (a.picked === null ? "No answer (time ran out)" : a.picked)));
+      if (!a.correct) item.append(el("small", "", "Correct answer: " + a.right));
+      review.append(item);
+    });
+    app.append(review);
+  }
+
+  showTopics();
+</script>
+</body>
+</html>
